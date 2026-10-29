@@ -94,3 +94,67 @@ def force_directed_layout(graph, iterations=300, area=1.0, seed=42, initial_pos=
                     distance = 1.0
 
                 force = (k * k) / distance
+                fx = (dx / distance) * force
+                fy = (dy / distance) * force
+
+                displacement[u][0] += fx
+                displacement[u][1] += fy
+                displacement[v][0] -= fx
+                displacement[v][1] -= fy
+
+        # (2) Endpoints of each edge attract each other.
+        for u, v in edges:
+            dx = pos[u][0] - pos[v][0]
+            dy = pos[u][1] - pos[v][1]
+            distance = math.hypot(dx, dy)
+            if distance < 1e-12:
+                continue
+
+            force = (distance * distance) / k
+            fx = (dx / distance) * force
+            fy = (dy / distance) * force
+
+            displacement[u][0] -= fx
+            displacement[u][1] -= fy
+            displacement[v][0] += fx
+            displacement[v][1] += fy
+
+        # (3) Move in the net force direction, but cap the step size.
+        temperature = initial_temperature * (1 - iteration / iterations)
+        for u in nodes:
+            dx, dy = displacement[u]
+            magnitude = math.hypot(dx, dy)
+            if magnitude > 1e-12:
+                step = min(magnitude, temperature)
+                pos[u][0] += (dx / magnitude) * step
+                pos[u][1] += (dy / magnitude) * step
+
+    # Center and uniformly rescale the picture without distorting its aspect ratio.
+    cx = sum(pos[u][0] for u in nodes) / n
+    cy = sum(pos[u][1] for u in nodes) / n
+    scale = max(max(abs(pos[u][0] - cx), abs(pos[u][1] - cy)) for u in nodes)
+    if scale < 1e-12:
+        scale = 1.0
+
+    return {u: ((pos[u][0] - cx) / scale, (pos[u][1] - cy) / scale)
+            for u in nodes}
+
+
+def main():
+    # Example: Zachary's karate club graph (34 vertices, 78 edges).
+    G = nx.karate_club_graph()
+    positions = force_directed_layout(G, iterations=400, seed=7)
+
+    plt.figure(figsize=(9, 7))
+    nx.draw_networkx(
+        G,
+        pos=positions,
+        node_size=330,
+        font_size=8,
+        node_color="#b9ddf7",
+        edge_color="#64748b",
+        width=1.1,
+    )
+    plt.title("Fruchterman-Reingold Force-Directed Layout")
+    plt.axis("off")
+    plt.tight_layout()
