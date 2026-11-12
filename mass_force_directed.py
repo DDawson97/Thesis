@@ -93,6 +93,7 @@ def _orientation(a, b, c):
     return ((b[0] - a[0]) * (c[1] - a[1])
             - (b[1] - a[1]) * (c[0] - a[0]))
 
+
 def _proper_cross(a, b, c, d):
     """Whether open segments ab and cd cross transversely (not at endpoints)."""
     ab_c = _orientation(a, b, c)
@@ -173,6 +174,7 @@ def _try_move(v, target, pos, edges, incident, mass, crossing_count):
                     trial_mass[endpoint] += change
 
     return _score(trial_mass, trial_count), trial_mass, trial_count
+
 
 def mass_force_directed_layout(graph, iterations=300, improvement_rounds=250,
                                crossings_per_round=10, seed=42):
@@ -270,6 +272,7 @@ def mass_force_directed_layout(graph, iterations=300, improvement_rounds=250,
         assert checked_mass == mass and checked_count == count
 
     return _normalize(pos)
+
 
 def main():
     # Petersen graph: nonplanar, so some crossings are unavoidable.

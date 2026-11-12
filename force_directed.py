@@ -6,7 +6,7 @@ Install dependencies:
 Run the demo:
     python force_directed.py
 
-To use in code:
+Use in your own code:
     pos = force_directed_layout(G, iterations=500, seed=7)
 """
 
@@ -158,3 +158,8 @@ def main():
     plt.title("Fruchterman-Reingold Force-Directed Layout")
     plt.axis("off")
     plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
